@@ -11,6 +11,7 @@ class BouquetItem extends Model
     protected $fillable = [
         'bouquet_id',
         'flower_id',
+        'user_id',
         'quantity'
     ];
 
@@ -24,6 +25,12 @@ class BouquetItem extends Model
     public function flower()
     {
         return $this->belongsTo(Flower::class);
+    }
+
+    // Связь с сотрудником (кто собрал)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     // Получить общую стоимость цветов в букете

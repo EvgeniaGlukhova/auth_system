@@ -19,7 +19,8 @@ class ReportControllerApi extends Controller
     public function revenue(Request $request)
     {
         $period = $request->get('period', 'day'); // day, week, month
-        $startDate = $this->getStartDate($period);
+        $date = $request->get('date');
+        $startDate = $this->getStartDate($period, $date);
 
         $revenue = Order::where('status', 'completed')
             ->where('created_at', '>=', $startDate)
@@ -45,28 +46,23 @@ class ReportControllerApi extends Controller
             })
             ->select('itemable_id', DB::raw('SUM(quantity) as total_quantity'))
             ->groupBy('itemable_id')
-            ->with('itemable')
             ->orderBy('total_quantity', 'desc')
             ->limit(10)
-            ->get();
-
-        $topBouquets = OrderItem::where('itemable_type', Bouquet::class)
-            ->whereHas('order', function($q) use ($month) {
-                $q->where('created_at', 'like', $month . '%')
-                    ->where('status', 'completed');
-            })
-            ->select('itemable_id', DB::raw('SUM(quantity) as total_quantity'))
-            ->groupBy('itemable_id')
-            ->with('itemable')
-            ->orderBy('total_quantity', 'desc')
-            ->limit(10)
-            ->get();
+            ->get()
+            ->map(function($item) {
+                $flower = Flower::find($item->itemable_id);
+                return [
+                    'id' => $item->itemable_id,
+                    'name' => $flower?->name,
+                    'total_quantity' => $item->total_quantity
+                ];
+            });
 
         return response()->json([
             'success' => true,
             'month' => $month,
             'top_flowers' => $topFlowers,
-            'top_bouquets' => $topBouquets
+
         ]);
     }
 
@@ -99,7 +95,9 @@ class ReportControllerApi extends Controller
     public function clientsStat(Request $request)
     {
         $period = $request->get('period', 'day');
-        $startDate = $this->getStartDate($period);
+        $date = $request->get('date');
+
+        $startDate = $this->getStartDate($period, $date);
 
         $newClients = Client::where('created_at', '>=', $startDate)->count();
         $totalClients = Client::count();
@@ -107,6 +105,7 @@ class ReportControllerApi extends Controller
         return response()->json([
             'success' => true,
             'period' => $period,
+            'start_date' => $startDate,
             'new_clients' => $newClients,
             'total_clients' => $totalClients
         ]);
@@ -116,8 +115,9 @@ class ReportControllerApi extends Controller
     public function ordersStat(Request $request)
     {
         $period = $request->get('period', 'day');
-        $startDate = $this->getStartDate($period);
+        $date = $request->get('date');
 
+        $startDate = $this->getStartDate($period, $date);
         $stats = [
             'total_orders' => Order::where('created_at', '>=', $startDate)->count(),
             'completed_orders' => Order::where('created_at', '>=', $startDate)
@@ -131,6 +131,7 @@ class ReportControllerApi extends Controller
         return response()->json([
             'success' => true,
             'period' => $period,
+            'start_date' => $startDate,
             'data' => $stats
         ]);
     }
@@ -184,7 +185,6 @@ class ReportControllerApi extends Controller
         $startDate = $request->get('start_date', now()->startOfMonth()->toDateString());
         $endDate = $request->get('end_date', now()->toDateString());
 
-        // Если у вас есть поле user_id/manager_id в заказах
         $sales = Order::whereBetween('created_at', [$startDate, $endDate])
             ->where('status', 'completed')
             ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id))
@@ -230,15 +230,47 @@ class ReportControllerApi extends Controller
     }
 
     // Вспомогательный метод для расчёта даты
-    private function getStartDate($period)
+    private function getStartDate($period, $date = null)
     {
+        $baseDate = $date ? \Carbon\Carbon::parse($date) : \Carbon\Carbon::now();
+
         switch ($period) {
             case 'week':
-                return now()->startOfWeek()->toDateString();
+                return $baseDate->copy()->startOfWeek()->toDateString();
             case 'month':
-                return now()->startOfMonth()->toDateString();
+                return $baseDate->copy()->startOfMonth()->toDateString();
+            case 'year':
+                return $baseDate->copy()->startOfYear()->toDateString();
             default:
-                return now()->startOfDay()->toDateString();
+                return $baseDate->copy()->startOfDay()->toDateString();
         }
+    }
+
+    // 9. ДИНАМИКА ВЫРУЧКИ (для графика)
+    public function revenueChart(Request $request)
+    {
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+
+        $query = Order::where('status', 'completed');
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $revenueByDay = $query
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(total_amount) as total'))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'labels' => $revenueByDay->pluck('date'),
+            'data' => $revenueByDay->pluck('total')
+        ]);
     }
 }

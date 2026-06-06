@@ -79,6 +79,21 @@ class User extends Authenticatable
         return $this->role->name === 'seller - florist';
     }
 
+    // (аксессор для полного имени)
+    public function getFullNameAttribute()
+    {
+        return "{$this->surname} {$this->name} {$this->patronymic}";
+    }
+
+    //  короткое имя
+    public function getShortNameAttribute()
+    {
+        return "{$this->name} {$this->surname}";
+    }
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
 
 

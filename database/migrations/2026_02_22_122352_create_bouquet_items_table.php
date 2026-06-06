@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('bouquet_id')->constrained('bouquets')->cascadeOnDelete();
             $table->foreignId('flower_id')->constrained('flowers');
+            $table->foreignId('user_id')->nullable()->constrained('users'); // кто собрал
             $table->integer('quantity');
             $table->timestamps();
         });

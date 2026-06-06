@@ -17,7 +17,7 @@ class OrderControllerApi extends Controller
      */
     public function index()
     {
-        $orders = Order::with(['client', 'items.itemable'])->get();
+        $orders = Order::with(['client', 'items.itemable', 'user', 'courier'])->get();
 
         return response()->json([
             'success' => true,
@@ -124,7 +124,10 @@ class OrderControllerApi extends Controller
             'client_phone' => 'nullable|string|max:20',
             'delivery_date' => 'nullable|date',
             'delivery_time' => 'nullable|date_format:H:i',
-            'assembly_date' => 'nullable|date',  // добавить валидацию для assembly_date
+            'assembly_date' => 'nullable|date',
+            'delivery_address' => 'nullable|string',
+            'delivery_type' => 'nullable|in:pickup,delivery',
+            'courier_id' => 'nullable|exists:users,id',
             'payment_method' => 'nullable|in:cash,card,qr',
             'comment' => 'nullable|string',
             'items' => 'required|array|min:1',
@@ -146,6 +149,9 @@ class OrderControllerApi extends Controller
                 'delivery_date' => $validated['delivery_date'] ?? null,
                 'delivery_time' => $validated['delivery_time'] ?? null,
                 'assembly_date' => $validated['assembly_date'] ?? null, // пользователь вводит сам
+                'delivery_address' => $validated['delivery_address'] ?? null,
+                'delivery_type' => $validated['delivery_type'] ?? 'pickup',
+                'courier_id' => $validated['courier_id'] ?? null,
                 'status' => $status,
                 'total_amount' => 0,
                 'payment_method' => $validated['payment_method'] ?? null,
@@ -190,7 +196,7 @@ class OrderControllerApi extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Order created successfully',
-                'data' => $order
+                'data' => $order->load(['client', 'items.itemable', 'user'])
             ], 201);
 
         } catch (\Exception $e) {
@@ -208,7 +214,7 @@ class OrderControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $order = Order::with(['client', 'items.itemable'])->findOrFail($id);
+        $order = Order::with(['client', 'items.itemable', 'user', 'courier'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -228,6 +234,9 @@ class OrderControllerApi extends Controller
             'delivery_date' => 'nullable|date',
             'delivery_time' => 'nullable|date_format:H:i',
             'assembly_date' => 'nullable|date',  // добавить возможность обновлять
+            'delivery_address' => 'nullable|string',
+            'delivery_type' => 'nullable|in:pickup,delivery',
+            'courier_id' => 'nullable|exists:users,id',
             'payment_method' => 'nullable|in:cash,card,qr',
             'comment' => 'nullable|string'
         ]);
@@ -255,4 +264,74 @@ class OrderControllerApi extends Controller
             'message' => 'Order deleted successfully'
         ]);
     }
+
+    public function complete(Request $request, string $id)
+    {
+        $order = Order::findOrFail($id);
+
+        if ($order->status === 'completed') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Заказ уже завершен'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Списываем товары со склада
+            foreach ($order->items as $item) {
+                $product = $item->itemable;
+                $newQuantity = $product->quantity - $item->quantity;
+
+                if ($newQuantity < 0) {
+                    throw new \Exception("Недостаточно товара: {$product->name}");
+                }
+
+                $product->quantity = $newQuantity;
+                $product->save();
+            }
+
+            // Меняем статус на completed
+            $order->status = 'completed';
+            $order->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Заказ завершен и товары списаны',
+                'data' => $order->load(['client', 'items.itemable', 'user', 'courier'])
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Назначить курьера на заказ
+     */
+    /**
+     * Назначить курьера на заказ
+     */
+//    public function assignCourier(Request $request, string $id)
+//    {
+//        $order = Order::findOrFail($id);
+//
+//        $validated = $request->validate([
+//            'courier_id' => 'required|exists:users,id'
+//        ]);
+//
+//        $order->courier_id = $validated['courier_id'];
+//        $order->save();
+//
+//        return response()->json([
+//            'success' => true,
+//            'message' => 'Курьер назначен',
+//            'data' => $order->load(['client', 'items.itemable', 'user', 'courier'])
+//        ]);
+//    }
 }

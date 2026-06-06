@@ -66,18 +66,13 @@ class FlowerControllerApi extends Controller
     {
         $flower = Flower::findOrFail($id);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'price' => 'sometimes|required|numeric|min:0'
-        ]);
-
-        $flower->update($validated);
-
-        $flower = Flower::findOrFail($id);
+        // Сохраняем старое количество
+        $oldQuantity = $flower->quantity;
 
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'price' => 'sometimes|required|numeric|min:0',
+            'quantity' => 'sometimes|required|integer|min:0',  // ← ДОБАВИТЬ QUANTITY
             'supplier_id' => 'nullable|exists:suppliers,id',
             'received_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after:received_date'
@@ -85,13 +80,27 @@ class FlowerControllerApi extends Controller
 
         $flower->update($validated);
 
+        // Если количество изменилось - записываем движение
+        if (isset($validated['quantity']) && $validated['quantity'] != $oldQuantity) {
+            $diff = $validated['quantity'] - $oldQuantity;
+            $type = $diff > 0 ? 'incoming' : 'outgoing';
+
+            FlowerMovement::create([
+                'flower_id' => $flower->id,
+                'type' => $type,
+                'quantity' => abs($diff),
+                'quantity_before' => $oldQuantity,
+                'quantity_after' => $validated['quantity'],
+                'reason' => $request->reason ?? ($diff > 0 ? 'Поставка' : 'Расход'),
+                'user_id' => auth()->id()
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Flower updated successfully',
             'data' => $flower->load('supplier')
         ]);
-
-
     }
 
     // Отдельный метод для поставки
@@ -126,43 +135,68 @@ class FlowerControllerApi extends Controller
     }
 
 // Отдельный метод для списания
+
     public function outgoing(Request $request, string $id)
     {
-        $flower = Flower::findOrFail($id);
+        try {
+            $flower = Flower::find($id);
+            if (!$flower) {
+                return response()->json(['error' => 'Цветок не найден'], 404);
+            }
 
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string',
-            'type' => 'required|in:outgoing,loss'
-        ]);
+            $quantity = $request->input('quantity');
+            $reason = $request->input('reason', 'Списание');
+            $type = $request->input('type', 'outgoing');
 
-        if ($flower->quantity < $validated['quantity']) {
+            if (!$quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Не указано количество для списания'
+                ], 400);
+            }
+
+            if ($flower->quantity < $quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Недостаточно цветов. В наличии: {$flower->quantity}"
+                ], 400);
+            }
+
+            $oldQuantity = $flower->quantity;
+
+            $flower->quantity = $flower->quantity - $quantity;
+            $flower->save();
+
+            $movement = FlowerMovement::create([
+                'flower_id' => $flower->id,
+                'type' => $type,
+                'quantity' => $quantity,
+                'quantity_before' => $oldQuantity,
+                'quantity_after' => $flower->quantity,
+                'reason' => $reason,
+                'user_id' => auth()->id() ?? 1
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Списание выполнено',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $flower->quantity,
+                'movement' => $movement
+            ]);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Недостаточно цветов'
-            ], 400);
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
         }
-
-        $oldQuantity = $flower->quantity;
-        $flower->quantity -= $validated['quantity'];
-        $flower->save();
-
-        FlowerMovement::create([
-            'flower_id' => $flower->id,
-            'type' => $validated['type'],
-            'quantity' => $validated['quantity'],
-            'quantity_before' => $oldQuantity,
-            'quantity_after' => $flower->quantity,
-            'reason' => $validated['reason'],
-            'user_id' => auth()->id()
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Списание выполнено',
-            'data' => $flower
-        ]);
     }
+
+
+
 
 
     public function destroy(string $id)

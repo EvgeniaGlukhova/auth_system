@@ -32,6 +32,12 @@ class RoleSeeder extends Seeder
                 'description' => 'Совмещает роль продавца и флориста',
                 'created_at' => now(),
                 'updated_at' => now()
+            ],
+            [
+                'name' => 'courier',        // ← ДОБАВИТЬ ЭТУ РОЛЬ
+                'description' => 'Курьер доставки',
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
     }

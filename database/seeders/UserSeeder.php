@@ -65,6 +65,19 @@ class UserSeeder extends Seeder
                 'remember_token' => null,
                 'created_at' => now(),
                 'updated_at' => now()
+            ],
+            [
+                'role_id' => 5,
+                'surname' => 'Курьеров',
+                'name' => 'Иван',
+                'patronymic' => 'Петрович',
+                'email' => 'courier@mail.com',
+                'phone' => '+7 (999) 555-66-77',
+                'email_verified_at' => '2026-04-01 09:00:00',
+                'password' => Hash::make('123456'),
+                'remember_token' => null,
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ]);
     }

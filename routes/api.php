@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\UserControllerApi;
 use App\Http\Controllers\Api\WorkshiftControllerApi;
 use App\Http\Controllers\Api\ScheduleControllerApi;
 use App\Http\Controllers\Api\ReportControllerApi;
+use App\Http\Controllers\Api\MaterialControllerApi;
 
 
 
@@ -45,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserControllerApi::class, 'index']);
     Route::get('/workshift', [WorkshiftControllerApi::class, 'index']);
     Route::get('/schedule', [ScheduleControllerApi::class, 'index']);
+    Route::get('/material', [MaterialControllerApi::class, 'index']);
 
 // POST запрос (создание)
     Route::post('/flower', [FlowerControllerApi::class, 'store']);
@@ -57,6 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/user', [UserControllerApi::class, 'store']);
     Route::post('/workshift', [WorkshiftControllerApi::class, 'store']);
     Route::post('/schedule', [ScheduleControllerApi::class, 'store']);
+    Route::post('/material', [MaterialControllerApi::class, 'store']);
+
+    Route::post('/order/{id}/complete', [OrderControllerApi::class, 'complete']);
 
 // PUT/PATCH запрос (изменение)
     Route::put('/flower/{id}', [FlowerControllerApi::class, 'update']);
@@ -69,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/{id}', [UserControllerApi::class, 'update']);
     Route::put('/workshift/{id}', [WorkshiftControllerApi::class, 'update']);
     Route::put('/schedule/{id}', [ScheduleControllerApi::class, 'update']);
+    Route::put('/material/{id}', [MaterialControllerApi::class, 'update']);
 
 
 
@@ -83,15 +89,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/user/{id}', [UserControllerApi::class, 'destroy']);
     Route::delete('/workshift/{id}', [WorkshiftControllerApi::class, 'destroy']);
     Route::delete('/schedule/{id}', [ScheduleControllerApi::class, 'destroy']);
+    Route::delete('/material/{id}', [MaterialControllerApi::class, 'destroy']);
 
     Route::apiResource('flower-movements', ReportControllerApi::class);
 
     Route::post('/flower/{id}/incoming', [FlowerControllerApi::class, 'incoming']);
     Route::post('/flower/{id}/outgoing', [FlowerControllerApi::class, 'outgoing']);
+    Route::post('/material/{id}/incoming', [MaterialControllerApi::class, 'incoming']);
+    Route::post('/material/{id}/outgoing', [MaterialControllerApi::class, 'outgoing']);
 
 // Отчёты
     Route::prefix('reports')->group(function () {
         Route::get('/revenue', [ReportControllerApi::class, 'revenue']);
+        Route::get('/revenue-chart', [ReportControllerApi::class, 'revenueChart']);
         Route::get('/top-products', [ReportControllerApi::class, 'topProducts']);
         Route::get('/flower-movements', [ReportControllerApi::class, 'flowerMovements']);
         Route::get('/clients', [ReportControllerApi::class, 'clientsStat']);
@@ -99,6 +109,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/employee-shifts', [ReportControllerApi::class, 'employeeShifts']);
         Route::get('/employee-sales', [ReportControllerApi::class, 'employeeSales']);
         Route::get('/flower-losses', [ReportControllerApi::class, 'flowerLosses']);
+        Route::get('/material/{id}', [MaterialControllerApi::class, 'show']);
     });
 });
 

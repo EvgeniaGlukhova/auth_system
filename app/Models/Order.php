@@ -16,16 +16,20 @@ class Order extends Model
         'delivery_date',
         'delivery_time',
         'assembly_date',
+        'delivery_address',
+        'delivery_type',
         'status',
         'total_amount',
         'payment_method',
         'comment',
-        'user_id'
+        'user_id',
+        'courier_id'
     ];
 
     protected $casts = [
         'delivery_date' => 'date',
-        'assembly_date' => 'date'
+        'assembly_date' => 'date',
+        'delivered_at' => 'datetime'
     ];
 
 
@@ -40,6 +44,12 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    // Связь с курьером
+    public function courier()
+    {
+        return $this->belongsTo(User::class, 'courier_id');
     }
 
     // Получить имя клиента
@@ -63,4 +73,18 @@ class Order extends Model
     {
         return $this->type === 'sale';
     }
+
+    // Связь с пользователем (сотрудником)
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // Проверка типа доставки
+    public function isPickup()
+    {
+        return $this->delivery_type === 'pickup';
+    }
+
+
 }

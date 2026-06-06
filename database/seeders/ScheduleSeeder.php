@@ -9,109 +9,49 @@ class ScheduleSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('schedules')->insert([
-            // График для администратора (user_id = 1)
-            [
+        $schedules = [];
+
+        // Рабочие дни в мае 2026 (1-31)
+        for ($day = 1; $day <= 31; $day++) {
+            $date = "2026-05-" . str_pad($day, 2, '0', STR_PAD_LEFT);
+
+            // Определяем выходные (суббота = 6, воскресенье = 7)
+            $weekend = (date('N', strtotime($date)) >= 6);
+
+            // Админ (9-18)
+            $schedules[] = [
                 'user_id' => 1,
-                'date' => '2026-04-01',
-                'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
-                'weekend' => false,
+                'date' => $date,
+                'start_time' => $weekend ? null : '09:00',
+                'end_time' => $weekend ? null : '18:00',
+                'weekend' => $weekend,
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            [
-                'user_id' => 1,
-                'date' => '2026-04-02',
-                'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'user_id' => 1,
-                'date' => '2026-04-03',
-                'start_time' => '09:00:00',
-                'end_time' => '14:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            // График для флориста (user_id = 2)
-            [
+            ];
+
+            // Флорист (10-16)
+            $schedules[] = [
                 'user_id' => 2,
-                'date' => '2026-04-01',
-                'start_time' => '10:00:00',
-                'end_time' => '19:00:00',
-                'weekend' => false,
+                'date' => $date,
+                'start_time' => $weekend ? null : '10:00',
+                'end_time' => $weekend ? null : '16:00',
+                'weekend' => $weekend,
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            [
-                'user_id' => 2,
-                'date' => '2026-04-02',
-                'start_time' => '10:00:00',
-                'end_time' => '19:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'user_id' => 2,
-                'date' => '2026-04-04',
-                'start_time' => null,
-                'end_time' => null,
-                'weekend' => true, // выходной
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'user_id' => 2,
-                'date' => '2026-04-10',
-                'start_time' => '10:00:00',
-                'end_time' => '16:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            // График для продавца (user_id = 3)
-            [
+            ];
+
+            // Продавец (12-20)
+            $schedules[] = [
                 'user_id' => 3,
-                'date' => '2026-04-01',
-                'start_time' => '09:00:00',
-                'end_time' => '17:00:00',
-                'weekend' => false,
+                'date' => $date,
+                'start_time' => $weekend ? null : '12:00',
+                'end_time' => $weekend ? null : '20:00',
+                'weekend' => $weekend,
                 'created_at' => now(),
                 'updated_at' => now()
-            ],
-            [
-                'user_id' => 3,
-                'date' => '2026-04-08',
-                'start_time' => '12:00:00',
-                'end_time' => '20:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'user_id' => 3,
-                'date' => '2026-04-15',
-                'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'user_id' => 3,
-                'date' => '2026-04-22',
-                'start_time' => '10:00:00',
-                'end_time' => '19:00:00',
-                'weekend' => false,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        ]);
+            ];
+        }
+
+        DB::table('schedules')->insert($schedules);
     }
 }

@@ -13,7 +13,7 @@ class WorkshiftSeeder extends Seeder
             // Смены администратора (user_id = 1)
             [
                 'user_id' => 1,
-                'date' => '2026-04-01',
+                'date' => '2026-05-03',
                 'start_time' => '09:00:00',
                 'end_time' => '18:00:00',
                 'closed' => true,
@@ -22,7 +22,7 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 1,
-                'date' => '2026-04-02',
+                'date' => '2026-05-04',
                 'start_time' => '09:00:00',
                 'end_time' => '18:00:00',
                 'closed' => true,
@@ -31,9 +31,90 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 1,
-                'date' => '2026-04-03',
+                'date' => '2026-05-05',
                 'start_time' => '09:00:00',
                 'end_time' => '14:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-11',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-12',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-13',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-14',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-15',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-17',
+                'start_time' => '10:00:00',
+                'end_time' => '16:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-18',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-19',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 1,
+                'date' => '2026-05-20',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -41,7 +122,7 @@ class WorkshiftSeeder extends Seeder
             // Смены флориста (user_id = 2)
             [
                 'user_id' => 2,
-                'date' => '2026-04-01',
+                'date' => '2026-05-03',
                 'start_time' => '10:00:00',
                 'end_time' => '19:00:00',
                 'closed' => true,
@@ -50,7 +131,7 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'date' => '2026-04-02',
+                'date' => '2026-05-04',
                 'start_time' => '10:00:00',
                 'end_time' => '19:00:00',
                 'closed' => true,
@@ -59,7 +140,16 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'date' => '2026-04-05',
+                'date' => '2026-05-05',
+                'start_time' => '12:00:00',
+                'end_time' => '20:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'date' => '2026-05-10',
                 'start_time' => '10:00:00',
                 'end_time' => '15:00:00',
                 'closed' => true,
@@ -68,9 +158,45 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 2,
-                'date' => '2026-04-08',
-                'start_time' => '12:00:00',
-                'end_time' => '20:00:00',
+                'date' => '2026-05-11',
+                'start_time' => '10:00:00',
+                'end_time' => '19:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'date' => '2026-05-12',
+                'start_time' => '10:00:00',
+                'end_time' => '19:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'date' => '2026-05-13',
+                'start_time' => '10:00:00',
+                'end_time' => '19:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'date' => '2026-05-14',
+                'start_time' => '10:00:00',
+                'end_time' => '19:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'date' => '2026-05-15',
+                'start_time' => '10:00:00',
+                'end_time' => '19:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -78,7 +204,7 @@ class WorkshiftSeeder extends Seeder
             // Смены продавца (user_id = 3)
             [
                 'user_id' => 3,
-                'date' => '2026-04-01',
+                'date' => '2026-05-03',
                 'start_time' => '09:00:00',
                 'end_time' => '17:00:00',
                 'closed' => true,
@@ -87,7 +213,34 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 3,
-                'date' => '2026-04-03',
+                'date' => '2026-05-04',
+                'start_time' => '11:00:00',
+                'end_time' => '19:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 3,
+                'date' => '2026-05-05',
+                'start_time' => '09:00:00',
+                'end_time' => '18:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 3,
+                'date' => '2026-05-07',
+                'start_time' => '09:00:00',
+                'end_time' => '17:00:00',
+                'closed' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 3,
+                'date' => '2026-05-08',
                 'start_time' => '12:00:00',
                 'end_time' => '20:00:00',
                 'closed' => true,
@@ -96,47 +249,46 @@ class WorkshiftSeeder extends Seeder
             ],
             [
                 'user_id' => 3,
-                'date' => '2026-04-08',
+                'date' => '2026-05-11',
                 'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
+                'end_time' => '17:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'user_id' => 3,
-                'date' => '2026-04-10',
-                'start_time' => '10:00:00',
-                'end_time' => '16:00:00',
+                'date' => '2026-05-12',
+                'start_time' => '12:00:00',
+                'end_time' => '20:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'user_id' => 3,
-                'date' => '2026-04-15',
+                'date' => '2026-05-13',
                 'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
+                'end_time' => '17:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
-            // Смены продавца-флориста (user_id = 4)
             [
-                'user_id' => 4,
-                'date' => '2026-04-10',
-                'start_time' => '10:00:00',
+                'user_id' => 3,
+                'date' => '2026-05-14',
+                'start_time' => '11:00:00',
                 'end_time' => '19:00:00',
                 'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'user_id' => 4,
-                'date' => '2026-04-20',
+                'user_id' => 3,
+                'date' => '2026-05-15',
                 'start_time' => '09:00:00',
-                'end_time' => '18:00:00',
-                'closed' => false, // открытая смена
+                'end_time' => '17:00:00',
+                'closed' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]

@@ -15,7 +15,7 @@ class BouquetItemControllerApi extends Controller
      */
     public function index()
     {
-        $bouquetItems = BouquetItem::with(['bouquet', 'flower'])->get();
+        $bouquetItems = BouquetItem::with(['bouquet', 'flower', 'user'])->get();
 
         return response()->json([
             'success' => true,
@@ -34,6 +34,8 @@ class BouquetItemControllerApi extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
+        $validated['user_id'] = auth()->id();
+
         $bouquetItem = BouquetItem::create($validated);
 
         return response()->json([
@@ -48,7 +50,12 @@ class BouquetItemControllerApi extends Controller
      */
     public function show(string $id)
     {
-        //
+        $bouquetItem = BouquetItem::with(['bouquet', 'flower', 'user'])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $bouquetItem
+        ]);
     }
 
     /**
@@ -67,7 +74,7 @@ class BouquetItemControllerApi extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Quantity updated successfully',
-            'data' => $bouquetItem
+            'data' => $bouquetItem->load(['bouquet', 'flower', 'user'])
         ]);
     }
 

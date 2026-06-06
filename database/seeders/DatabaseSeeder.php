@@ -31,7 +31,8 @@ class DatabaseSeeder extends Seeder
             ScheduleSeeder::class,
             WorkshiftSeeder::class,
             WarehouseSeeder::class,
-            BouquetItemSeeder::class
+            BouquetItemSeeder::class,
+            MaterialSeeder::class
 
         ]);
     }
