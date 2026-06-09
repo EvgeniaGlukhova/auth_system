@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Material;
+use App\Models\Movement;
 use Illuminate\Http\Request;
 
 class MaterialControllerApi extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $materials = Material::with('supplier')->get();
@@ -21,9 +19,6 @@ class MaterialControllerApi extends Controller
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -37,6 +32,20 @@ class MaterialControllerApi extends Controller
 
         $material = Material::create($validated);
 
+
+        if ($material->quantity > 0) {
+            Movement::create([
+                'movable_id' => $material->id,
+                'movable_type' => Material::class,
+                'type' => 'incoming',
+                'quantity' => $material->quantity,
+                'quantity_before' => 0,
+                'quantity_after' => $material->quantity,
+                'reason' => 'Первоначальное поступление',
+                'user_id' => auth()->id()
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Material created successfully',
@@ -44,12 +53,9 @@ class MaterialControllerApi extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
-        $material = Material::with('supplier')->findOrFail($id);
+        $material = Material::with(['supplier', 'movements.user'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -57,9 +63,6 @@ class MaterialControllerApi extends Controller
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $material = Material::findOrFail($id);
@@ -70,6 +73,7 @@ class MaterialControllerApi extends Controller
             'price' => 'sometimes|required|numeric|min:0',
             'supplier_id' => 'nullable|exists:suppliers,id',
             'expiry_date' => 'nullable|date'
+
         ]);
 
         $material->update($validated);
@@ -81,12 +85,24 @@ class MaterialControllerApi extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $material = Material::findOrFail($id);
+
+
+        if ($material->quantity > 0) {
+            Movement::create([
+                'movable_id' => $material->id,
+                'movable_type' => Material::class,
+                'type' => 'loss',
+                'quantity' => $material->quantity,
+                'quantity_before' => $material->quantity,
+                'quantity_after' => 0,
+                'reason' => 'Удаление материала из системы',
+                'user_id' => auth()->id()
+            ]);
+        }
+
         $material->delete();
 
         return response()->json([
@@ -95,9 +111,6 @@ class MaterialControllerApi extends Controller
         ]);
     }
 
-    /**
-     * Приход материала (incoming)
-     */
     public function incoming(Request $request, string $id)
     {
         $material = Material::findOrFail($id);
@@ -107,42 +120,85 @@ class MaterialControllerApi extends Controller
             'reason' => 'required|string'
         ]);
 
+        $oldQuantity = $material->quantity;
         $material->quantity += $validated['quantity'];
         $material->save();
+
+        Movement::create([
+            'movable_id' => $material->id,
+            'movable_type' => Material::class,
+            'type' => 'incoming',
+            'quantity' => $validated['quantity'],
+            'quantity_before' => $oldQuantity,
+            'quantity_after' => $material->quantity,
+            'reason' => $validated['reason'],
+            'user_id' => auth()->id()
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Поставка материала добавлена',
-            'data' => $material
+            'data' => $material->load('supplier')
         ]);
     }
 
-    /**
-     * Расход материала (outgoing)
-     */
     public function outgoing(Request $request, string $id)
     {
-        $material = Material::findOrFail($id);
+        try {
+            $material = Material::find($id);
+            if (!$material) {
+                return response()->json(['error' => 'Материал не найден'], 404);
+            }
 
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string'
-        ]);
+            $quantity = $request->input('quantity');
+            $reason = $request->input('reason', 'Списание');
+            $type = $request->input('type', 'outgoing');
 
-        if ($material->quantity < $validated['quantity']) {
+            if (!$quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Не указано количество для списания'
+                ], 400);
+            }
+
+            if ($material->quantity < $quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Недостаточно материала. В наличии: {$material->quantity}"
+                ], 400);
+            }
+
+            $oldQuantity = $material->quantity;
+            $material->quantity = $material->quantity - $quantity;
+            $material->save();
+
+            $movement = Movement::create([
+                'movable_id' => $material->id,
+                'movable_type' => Material::class,
+                'type' => $type,
+                'quantity' => $quantity,
+                'quantity_before' => $oldQuantity,
+                'quantity_after' => $material->quantity,
+                'reason' => $reason,
+                'user_id' => auth()->id() ?? 1
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Списание материала выполнено',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $material->quantity,
+                'data' => $material->load('supplier'),
+                'movement' => $movement
+            ]);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Недостаточно материала'
-            ], 400);
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
         }
-
-        $material->quantity -= $validated['quantity'];
-        $material->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Списание материала выполнено',
-            'data' => $material
-        ]);
     }
 }

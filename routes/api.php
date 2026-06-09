@@ -91,19 +91,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/schedule/{id}', [ScheduleControllerApi::class, 'destroy']);
     Route::delete('/material/{id}', [MaterialControllerApi::class, 'destroy']);
 
-    Route::apiResource('flower-movements', ReportControllerApi::class);
+//    Route::apiResource('movements', ReportControllerApi::class);
 
     Route::post('/flower/{id}/incoming', [FlowerControllerApi::class, 'incoming']);
     Route::post('/flower/{id}/outgoing', [FlowerControllerApi::class, 'outgoing']);
     Route::post('/material/{id}/incoming', [MaterialControllerApi::class, 'incoming']);
     Route::post('/material/{id}/outgoing', [MaterialControllerApi::class, 'outgoing']);
+    Route::post('/bouquet/{id}/incoming', [BouquetControllerApi::class, 'incoming']);
+    Route::post('/bouquet/{id}/outgoing', [BouquetControllerApi::class, 'outgoing']);
 
 // Отчёты
     Route::prefix('reports')->group(function () {
         Route::get('/revenue', [ReportControllerApi::class, 'revenue']);
         Route::get('/revenue-chart', [ReportControllerApi::class, 'revenueChart']);
         Route::get('/top-products', [ReportControllerApi::class, 'topProducts']);
-        Route::get('/flower-movements', [ReportControllerApi::class, 'flowerMovements']);
+        Route::get('/movements', [ReportControllerApi::class, 'movements']);
         Route::get('/clients', [ReportControllerApi::class, 'clientsStat']);
         Route::get('/orders', [ReportControllerApi::class, 'ordersStat']);
         Route::get('/employee-shifts', [ReportControllerApi::class, 'employeeShifts']);

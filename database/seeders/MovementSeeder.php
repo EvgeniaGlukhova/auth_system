@@ -5,14 +5,15 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class FlowerMovementSeeder extends Seeder
+class MovementSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('flower_movements')->insert([
-            // ПРИХОДЫ (incoming) - поставки
+        DB::table('movements')->insert([
+            // ========== ПРИХОДЫ ЦВЕТОВ (incoming) ==========
             [
-                'flower_id' => 1,
+                'movable_id' => 1,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 120,
                 'quantity_before' => 0,
@@ -23,7 +24,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 4,
+                'movable_id' => 4,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 250,
                 'quantity_before' => 0,
@@ -34,7 +36,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 7,
+                'movable_id' => 7,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 80,
                 'quantity_before' => 0,
@@ -45,7 +48,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 14,
+                'movable_id' => 14,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 60,
                 'quantity_before' => 0,
@@ -56,7 +60,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 18,
+                'movable_id' => 18,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 300,
                 'quantity_before' => 0,
@@ -67,9 +72,10 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
 
-            // РАСХОДЫ (outgoing) - продажи
+            // ========== РАСХОДЫ ЦВЕТОВ (outgoing) ==========
             [
-                'flower_id' => 1,
+                'movable_id' => 1,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 15,
                 'quantity_before' => 120,
@@ -80,7 +86,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 4,
+                'movable_id' => 4,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 50,
                 'quantity_before' => 250,
@@ -91,7 +98,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 7,
+                'movable_id' => 7,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 20,
                 'quantity_before' => 80,
@@ -102,7 +110,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 2,
+                'movable_id' => 2,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 25,
                 'quantity_before' => 100,
@@ -113,7 +122,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 14,
+                'movable_id' => 14,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 10,
                 'quantity_before' => 60,
@@ -124,7 +134,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 18,
+                'movable_id' => 18,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 40,
                 'quantity_before' => 300,
@@ -135,7 +146,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 3,
+                'movable_id' => 3,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 12,
                 'quantity_before' => 110,
@@ -146,9 +158,10 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
 
-            // ПОТЕРИ (loss) - списание порчи
+            // ========== ПОТЕРИ ЦВЕТОВ (loss) ==========
             [
-                'flower_id' => 4,
+                'movable_id' => 4,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'loss',
                 'quantity' => 10,
                 'quantity_before' => 200,
@@ -159,7 +172,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 5,
+                'movable_id' => 5,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'loss',
                 'quantity' => 8,
                 'quantity_before' => 220,
@@ -170,7 +184,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 10,
+                'movable_id' => 10,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'loss',
                 'quantity' => 15,
                 'quantity_before' => 150,
@@ -181,7 +196,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 12,
+                'movable_id' => 12,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'loss',
                 'quantity' => 5,
                 'quantity_before' => 200,
@@ -192,9 +208,10 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
 
-            // ДОПОЛНИТЕЛЬНЫЕ ПОСТАВКИ (incoming)
+            // ========== ДОПОЛНИТЕЛЬНЫЕ ПОСТАВКИ (incoming) ==========
             [
-                'flower_id' => 1,
+                'movable_id' => 1,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 50,
                 'quantity_before' => 105,
@@ -205,7 +222,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 7,
+                'movable_id' => 7,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 30,
                 'quantity_before' => 60,
@@ -216,7 +234,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 19,
+                'movable_id' => 19,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'incoming',
                 'quantity' => 200,
                 'quantity_before' => 400,
@@ -227,7 +246,8 @@ class FlowerMovementSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'flower_id' => 4,
+                'movable_id' => 4,
+                'movable_type' => 'App\Models\Flower',
                 'type' => 'outgoing',
                 'quantity' => 30,
                 'quantity_before' => 190,
@@ -236,7 +256,59 @@ class FlowerMovementSeeder extends Seeder
                 'user_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
-            ]
+            ],
+
+            // ========== ПРИХОДЫ БУКЕТОВ (incoming) ==========
+            [
+                'movable_id' => 1,
+                'movable_type' => 'App\Models\Bouquet',
+                'type' => 'incoming',
+                'quantity' => 15,
+                'quantity_before' => 0,
+                'quantity_after' => 15,
+                'reason' => 'Сборка весенних букетов',
+                'user_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'movable_id' => 2,
+                'movable_type' => 'App\Models\Bouquet',
+                'type' => 'incoming',
+                'quantity' => 10,
+                'quantity_before' => 0,
+                'quantity_after' => 10,
+                'reason' => 'Сборка романтических букетов',
+                'user_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+
+            // ========== ПРИХОДЫ МАТЕРИАЛОВ (incoming) ==========
+            [
+                'movable_id' => 1,
+                'movable_type' => 'App\Models\Material',
+                'type' => 'incoming',
+                'quantity' => 100,
+                'quantity_before' => 0,
+                'quantity_after' => 100,
+                'reason' => 'Поставка атласных лент',
+                'user_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'movable_id' => 5,
+                'movable_type' => 'App\Models\Material',
+                'type' => 'incoming',
+                'quantity' => 200,
+                'quantity_before' => 0,
+                'quantity_after' => 200,
+                'reason' => 'Поставка прозрачной плёнки',
+                'user_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ]);
     }
 }

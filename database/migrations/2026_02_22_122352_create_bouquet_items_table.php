@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bouquet_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('bouquet_id')->constrained('bouquets')->cascadeOnDelete();
-            $table->foreignId('flower_id')->constrained('flowers');
+            $table->morphs('itemable');
             $table->foreignId('user_id')->nullable()->constrained('users'); // кто собрал
             $table->integer('quantity');
             $table->timestamps();

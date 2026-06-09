@@ -25,5 +25,10 @@ class Material extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function movements()
+    {
+        return $this->morphMany(Movement::class, 'movable');
+    }
+
 
 }

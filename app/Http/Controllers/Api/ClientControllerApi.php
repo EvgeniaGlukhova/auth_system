@@ -11,11 +11,25 @@ class ClientControllerApi extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        $search = $request->get('search');
+
+        // Временная отладка
+        $clients = Client::when($search, function($query) use ($search) {
+            return $query->where('surname', 'like', "%{$search}%")
+                ->orWhere('name', 'like', "%{$search}%")
+                ->orWhere('patronymic', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+        })->get();
+
+        // Для проверки - вернем и search, и количество
         return response()->json([
-            'success' => true,
-            'data' => Client::all()
+            'search' => $search,
+            'count' => $clients->count(),
+            'data' => $clients
         ]);
     }
 

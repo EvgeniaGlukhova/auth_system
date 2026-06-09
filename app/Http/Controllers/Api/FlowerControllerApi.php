@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Flower;
-use App\Models\FlowerMovement;
+use App\Models\Movement;
 
 class FlowerControllerApi extends Controller
 {
 
     public function index()
     {
+
         $flowers = Flower::with('supplier')->get();  // ← добавить with('supplier')
         return response()->json($flowers);
 
@@ -20,6 +21,8 @@ class FlowerControllerApi extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('Метод store вызван', ['data' => $request->all()]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
@@ -32,7 +35,7 @@ class FlowerControllerApi extends Controller
         $flower = Flower::create($validated);
 
         if ($flower->quantity > 0) {
-            FlowerMovement::create([
+            Movement::create([
                 'flower_id' => $flower->id,
                 'type' => 'incoming',
                 'quantity' => $flower->quantity,
@@ -85,7 +88,7 @@ class FlowerControllerApi extends Controller
             $diff = $validated['quantity'] - $oldQuantity;
             $type = $diff > 0 ? 'incoming' : 'outgoing';
 
-            FlowerMovement::create([
+            Movement::create([
                 'flower_id' => $flower->id,
                 'type' => $type,
                 'quantity' => abs($diff),
@@ -110,15 +113,17 @@ class FlowerControllerApi extends Controller
 
         $validated = $request->validate([
             'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string'
+            'reason' => 'required|string',
+            'user_id' => 'nullable|exists:users,id'
         ]);
 
         $oldQuantity = $flower->quantity;
         $flower->quantity += $validated['quantity'];
         $flower->save();
 
-        FlowerMovement::create([
-            'flower_id' => $flower->id,
+        Movement::create([
+            'movable_id' => $flower->id,
+            'movable_type' => Flower::class,  // или 'App\Models\Flower'
             'type' => 'incoming',
             'quantity' => $validated['quantity'],
             'quantity_before' => $oldQuantity,
@@ -167,8 +172,9 @@ class FlowerControllerApi extends Controller
             $flower->quantity = $flower->quantity - $quantity;
             $flower->save();
 
-            $movement = FlowerMovement::create([
-                'flower_id' => $flower->id,
+            $movement = Movement::create([
+                'movable_id' => $flower->id,
+                'movable_type' => Flower::class,  // или 'App\Models\Flower'
                 'type' => $type,
                 'quantity' => $quantity,
                 'quantity_before' => $oldQuantity,

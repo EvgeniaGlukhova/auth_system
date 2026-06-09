@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('flower_movements', function (Blueprint $table) {
+        Schema::create('movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('flower_id')->constrained('flowers');
+            $table->morphs('movable');
             $table->enum('type', ['incoming', 'outgoing', 'loss']);
             $table->integer('quantity');
             $table->integer('quantity_before');
@@ -24,11 +21,8 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('flower_movements');
+        Schema::dropIfExists('movements');
     }
 };

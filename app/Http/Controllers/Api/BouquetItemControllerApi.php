@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\BouquetItem;
 use App\Models\Bouquet;
 use App\Models\Flower;
+use App\Models\Material;
 
 class BouquetItemControllerApi extends Controller
 {
@@ -15,7 +16,7 @@ class BouquetItemControllerApi extends Controller
      */
     public function index()
     {
-        $bouquetItems = BouquetItem::with(['bouquet', 'flower', 'user'])->get();
+        $bouquetItems = BouquetItem::with(['bouquet', 'itemable', 'user'])->get();
 
         return response()->json([
             'success' => true,
@@ -30,18 +31,35 @@ class BouquetItemControllerApi extends Controller
     {
         $validated = $request->validate([
             'bouquet_id' => 'required|exists:bouquets,id',
-            'flower_id' => 'required|exists:flowers,id',
+            'itemable_id' => 'required|integer',
+            'itemable_type' => 'required|in:flower,material',
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $validated['user_id'] = auth()->id();
+        // Преобразуем тип в полное имя класса
+        $typeClass = $validated['itemable_type'] === 'flower'
+            ? Flower::class
+            : Material::class;
 
-        $bouquetItem = BouquetItem::create($validated);
+        // Проверяем, существует ли такой компонент
+        if ($typeClass === Flower::class) {
+            Flower::findOrFail($validated['itemable_id']);
+        } else {
+            Material::findOrFail($validated['itemable_id']);
+        }
+
+        $bouquetItem = BouquetItem::create([
+            'bouquet_id' => $validated['bouquet_id'],
+            'itemable_id' => $validated['itemable_id'],
+            'itemable_type' => $typeClass,
+            'user_id' => auth()->id(),
+            'quantity' => $validated['quantity']
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Flower added to bouquet successfully',
-            'data' => $bouquetItem
+            'message' => 'Component added to bouquet successfully',
+            'data' => $bouquetItem->load(['bouquet', 'itemable', 'user'])
         ], 201);
     }
 
@@ -50,7 +68,7 @@ class BouquetItemControllerApi extends Controller
      */
     public function show(string $id)
     {
-        $bouquetItem = BouquetItem::with(['bouquet', 'flower', 'user'])->findOrFail($id);
+        $bouquetItem = BouquetItem::with(['bouquet', 'itemable', 'user'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -74,7 +92,7 @@ class BouquetItemControllerApi extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Quantity updated successfully',
-            'data' => $bouquetItem->load(['bouquet', 'flower', 'user'])
+            'data' => $bouquetItem->load(['bouquet', 'itemable', 'user'])
         ]);
     }
 
@@ -88,7 +106,25 @@ class BouquetItemControllerApi extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Flower removed from bouquet successfully'
+            'message' => 'Component removed from bouquet successfully'
+        ]);
+    }
+
+    /**
+     * Get all components for a specific bouquet
+     */
+    public function getByBouquet($bouquetId)
+    {
+        $bouquet = Bouquet::findOrFail($bouquetId);
+
+        $components = BouquetItem::with(['itemable', 'user'])
+            ->where('bouquet_id', $bouquetId)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'bouquet' => $bouquet->name,
+            'data' => $components
         ]);
     }
 }

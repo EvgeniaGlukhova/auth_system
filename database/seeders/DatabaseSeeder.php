@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             OrderSeeder::class,
             OrderItemSeeder::class,
-            FlowerMovementSeeder::class,
+            MovementSeeder::class,
             ScheduleSeeder::class,
             WorkshiftSeeder::class,
             WarehouseSeeder::class,

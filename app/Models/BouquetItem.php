@@ -10,7 +10,8 @@ class BouquetItem extends Model
 
     protected $fillable = [
         'bouquet_id',
-        'flower_id',
+        'itemable_id',
+        'itemable_type',
         'user_id',
         'quantity'
     ];
@@ -21,10 +22,10 @@ class BouquetItem extends Model
         return $this->belongsTo(Bouquet::class);
     }
 
-    // Связь с цветком
-    public function flower()
+    // Полиморфная связь с цветком или материалом
+    public function itemable()
     {
-        return $this->belongsTo(Flower::class);
+        return $this->morphTo();
     }
 
     // Связь с сотрудником (кто собрал)
@@ -33,9 +34,29 @@ class BouquetItem extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Получить общую стоимость цветов в букете
+
+
+    // Получить тип компонента (цветок или материал)
+    public function getItemTypeAttribute()
+    {
+        if ($this->itemable_type === Flower::class) {
+            return 'flower';
+        }
+        if ($this->itemable_type === Material::class) {
+            return 'material';
+        }
+        return 'unknown';
+    }
+
+    // Получить цену компонента
+    public function getItemPriceAttribute()
+    {
+        return $this->itemable ? $this->itemable->price : 0;
+    }
+
+    // Получить общую стоимость
     public function getTotalPriceAttribute()
     {
-        return $this->flower->price * $this->quantity;
+        return $this->getItemPriceAttribute() * $this->quantity;
     }
 }

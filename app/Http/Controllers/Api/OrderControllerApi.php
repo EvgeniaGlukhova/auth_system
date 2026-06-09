@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Flower;
 use App\Models\Bouquet;
+use App\Models\Material;
 use Illuminate\Support\Facades\DB;
 
 class OrderControllerApi extends Controller
@@ -167,9 +168,14 @@ class OrderControllerApi extends Controller
                 if ($item['type'] === 'flower') {
                     $product = Flower::findOrFail($item['id']);
                     $type = Flower::class;
-                } else {
+                } elseif ($item['type'] === 'bouquet') {
                     $product = Bouquet::findOrFail($item['id']);
                     $type = Bouquet::class;
+                } elseif ($item['type'] === 'material') {
+                    $product = Material::findOrFail($item['id']);
+                    $type = Material::class;
+                } else {
+                    throw new \Exception("Неизвестный тип товара: {$item['type']}");
                 }
 
                 $price = $product->price;

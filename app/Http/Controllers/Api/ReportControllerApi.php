@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Flower;
-use App\Models\FlowerMovement; // создадим позже
+use App\Models\Movement;
 use App\Models\Workshift;
 use App\Models\User;
 use App\Models\Client;
@@ -67,16 +67,26 @@ class ReportControllerApi extends Controller
     }
 
     // 3. ИСТОРИЯ ДВИЖЕНИЯ ЦВЕТОВ (приход/расход/потери)
-    public function flowerMovements(Request $request)
+    public function movements(Request $request)
     {
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
+        $movableType = $request->get('movable_type');
 
-        $movements = FlowerMovement::with('flower', 'user')
-            ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
-            ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Movement::with('movable', 'user');
+
+        if ($movableType) {
+            $query->where('movable_type', $movableType);
+        }
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        $movements = $query->orderBy('created_at', 'desc')->get();
 
         $summary = [
             'total_incoming' => $movements->where('type', 'incoming')->sum('quantity'),
@@ -207,7 +217,7 @@ class ReportControllerApi extends Controller
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
-        $losses = FlowerMovement::where('type', 'loss')
+        $losses = Movement::where('type', 'loss')
             ->when($startDate, fn($q) => $q->whereDate('created_at', '>=', $startDate))
             ->when($endDate, fn($q) => $q->whereDate('created_at', '<=', $endDate))
             ->with('flower')
