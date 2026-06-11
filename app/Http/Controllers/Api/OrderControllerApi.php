@@ -132,7 +132,7 @@ class OrderControllerApi extends Controller
             'payment_method' => 'nullable|in:cash,card,qr',
             'comment' => 'nullable|string',
             'items' => 'required|array|min:1',
-            'items.*.type' => 'required|in:flower,bouquet',
+            'items.*.type' => 'required|in:flower,bouquet,material',
             'items.*.id' => 'required|integer',
             'items.*.quantity' => 'required|integer|min:1'
         ]);
